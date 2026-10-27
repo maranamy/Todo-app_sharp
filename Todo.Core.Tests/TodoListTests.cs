@@ -1,3 +1,5 @@
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+
 namespace Todo.Core.Tests;
 
 public class TodoListTests
@@ -27,6 +29,26 @@ public class TodoListTests
         var found = list.Find("buy").ToList();
         Assert.Single(found);
         Assert.Equal("Buy milk", found[0].Title);
+    }
+
+    [Fact]
+    public void Save_and_Load_WorkCheck()
+    {
+        string filePath = Path.GetTempFileName();
+        var list = new TodoList();
+        list.Add("hi");
+        list.Add("buy book");
+        var item = list.Add("to me");
+        item.MarkDone();
+
+        list.Save(filePath);
+
+        var loadedData = new TodoList();
+        loadedData.Load(filePath);
+
+        Assert.Equal(list.Count, loadedData.Count);
+        Assert.Equal("buy book", loadedData.Items[1].Title);
+        Assert.True(loadedData.Items[2].IsDone);
     }
 
 }
